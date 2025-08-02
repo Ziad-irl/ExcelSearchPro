@@ -36,13 +36,15 @@ def build_gui_exe():
         "--onefile",
         "--windowed",
         "--name=ExcelSearchPro-GUI",
-        "--icon=icon.ico",
-        "--add-data=icon.ico;.",
         "--distpath=dist",
         "--workpath=build",
         "--specpath=.",
         "excel_search_gui.py"
     ]
+    
+    # Add icon if it exists
+    if Path("icon.ico").exists():
+        cmd.extend(["--icon=icon.ico", "--add-data=icon.ico;."])
     
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -60,12 +62,15 @@ def build_cli_exe():
         "pyinstaller",
         "--onefile",
         "--name=ExcelSearchPro-CLI",
-        "--icon=icon.ico",
         "--distpath=dist",
         "--workpath=build",
         "--specpath=.",
         "excel_search_cli.py"
     ]
+    
+    # Add icon if it exists
+    if Path("icon.ico").exists():
+        cmd.extend(["--icon=icon.ico"])
     
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -83,13 +88,15 @@ def build_main_exe():
         "pyinstaller",
         "--onefile",
         "--name=ExcelSearchPro",
-        "--icon=icon.ico",
-        "--add-data=icon.ico;.",
         "--distpath=dist",
         "--workpath=build",
         "--specpath=.",
         "main.py"
     ]
+    
+    # Add icon if it exists
+    if Path("icon.ico").exists():
+        cmd.extend(["--icon=icon.ico", "--add-data=icon.ico;."])
     
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
