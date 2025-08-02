@@ -43,13 +43,6 @@ python excel_search_cli.py --interactive
 
 ### 🌐 Unicode Filename Support
 ✅ **Full support for Arabic, Chinese, and other Unicode filenames**
-```
-Example files that work perfectly:
-• نتيجة الثانوية العامة 2025.xlsx
-• 学生成绩表.xlsx  
-• データベース.xlsx
-• файл_данных.xlsx
-```
 
 ## ✨ Features
 
