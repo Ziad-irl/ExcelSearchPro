@@ -1,6 +1,6 @@
-# 🔍 ExcelSearchPro
+# 🔍 ExceA powerful, lightning-fast search tool for large Excel databases. Search through millions of rows in milliseconds with an intuitive GUI or blazing-fast command-line interface.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## 🚀 Quick StartLicense: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)](https://github.com/Ziad-irl/ExcelSearchPro)
 [![CI/CD](https://github.com/Ziad-irl/ExcelSearchPro/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/Ziad-irl/ExcelSearchPro/actions)
