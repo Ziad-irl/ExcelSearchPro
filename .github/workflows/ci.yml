@@ -70,10 +70,12 @@ jobs:
     
     - name: Build executables (Windows)
       if: matrix.os == 'windows-latest'
-      shell: cmd
       run: |
-        set PYTHONIOENCODING=utf-8
+        python -c "import sys; print('Python version:', sys.version)"
+        python -c "import os; print('OS name:', os.name)"
         python build_exe.py
+      env:
+        PYTHONIOENCODING: utf-8
         
     - name: Build executables (Linux/macOS)
       if: matrix.os != 'windows-latest'

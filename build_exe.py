@@ -27,6 +27,34 @@ def check_pyinstaller():
             print("[ERROR] Failed to install PyInstaller")
             return False
 
+def check_dependencies():
+    """Check if all required dependencies are available"""
+    print("\n[CHECK] Verifying dependencies...")
+    required_packages = ['pandas', 'openpyxl', 'xlrd']
+    missing_packages = []
+    
+    for package in required_packages:
+        try:
+            __import__(package)
+            print(f"[OK] {package}")
+        except ImportError:
+            print(f"[ERROR] {package} not found")
+            missing_packages.append(package)
+    
+    if missing_packages:
+        print(f"[ERROR] Missing packages: {missing_packages}")
+        print("Installing missing packages...")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install"] + missing_packages)
+            print("[OK] All dependencies installed")
+            return True
+        except subprocess.CalledProcessError:
+            print("[ERROR] Failed to install dependencies")
+            return False
+    
+    print("[OK] All dependencies available")
+    return True
+
 def build_gui_exe():
     """Build the GUI executable"""
     print("\n[BUILD] Building GUI Executable...")
@@ -42,16 +70,26 @@ def build_gui_exe():
         "excel_search_gui.py"
     ]
     
-    # Add icon if it exists
+    # Add icon if it exists (handle Windows vs Unix path separators)
     if Path("icon.ico").exists():
-        cmd.extend(["--icon=icon.ico", "--add-data=icon.ico;."])
+        cmd.append("--icon=icon.ico")
+        if os.name == 'nt':  # Windows
+            cmd.append("--add-data=icon.ico;.")
+        else:  # Unix/Linux/macOS
+            cmd.append("--add-data=icon.ico:.")
     
     try:
+        print(f"[DEBUG] Command: {' '.join(cmd)}")
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         print("[OK] GUI executable created successfully")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Failed to build GUI executable: {e}")
+        print(f"[ERROR] Failed to build GUI executable")
+        print(f"[ERROR] Return code: {e.returncode}")
+        if e.stdout:
+            print(f"[ERROR] STDOUT: {e.stdout}")
+        if e.stderr:
+            print(f"[ERROR] STDERR: {e.stderr}")
         return False
 
 def build_cli_exe():
@@ -70,14 +108,20 @@ def build_cli_exe():
     
     # Add icon if it exists
     if Path("icon.ico").exists():
-        cmd.extend(["--icon=icon.ico"])
+        cmd.append("--icon=icon.ico")
     
     try:
+        print(f"[DEBUG] Command: {' '.join(cmd)}")
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         print("[OK] CLI executable created successfully")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Failed to build CLI executable: {e}")
+        print(f"[ERROR] Failed to build CLI executable")
+        print(f"[ERROR] Return code: {e.returncode}")
+        if e.stdout:
+            print(f"[ERROR] STDOUT: {e.stdout}")
+        if e.stderr:
+            print(f"[ERROR] STDERR: {e.stderr}")
         return False
 
 def build_main_exe():
@@ -94,16 +138,26 @@ def build_main_exe():
         "main.py"
     ]
     
-    # Add icon if it exists
+    # Add icon if it exists (handle Windows vs Unix path separators)
     if Path("icon.ico").exists():
-        cmd.extend(["--icon=icon.ico", "--add-data=icon.ico;."])
+        cmd.append("--icon=icon.ico")
+        if os.name == 'nt':  # Windows
+            cmd.append("--add-data=icon.ico;.")
+        else:  # Unix/Linux/macOS
+            cmd.append("--add-data=icon.ico:.")
     
     try:
+        print(f"[DEBUG] Command: {' '.join(cmd)}")
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         print("[OK] Main launcher executable created successfully")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Failed to build main executable: {e}")
+        print(f"[ERROR] Failed to build main executable")
+        print(f"[ERROR] Return code: {e.returncode}")
+        if e.stdout:
+            print(f"[ERROR] STDOUT: {e.stdout}")
+        if e.stderr:
+            print(f"[ERROR] STDERR: {e.stderr}")
         return False
 
 def create_installer_script():
@@ -192,9 +246,22 @@ def main():
     print("EXCELSEARCHPRO EXECUTABLE BUILDER")
     print("=" * 50)
     
+    # Check dependencies first
+    if not check_dependencies():
+        return False
+    
     # Check PyInstaller
     if not check_pyinstaller():
         return False
+    
+    # Verify source files exist
+    required_files = ['main.py', 'excel_search_gui.py', 'excel_search_cli.py']
+    for file_name in required_files:
+        if not Path(file_name).exists():
+            print(f"[ERROR] Required file not found: {file_name}")
+            return False
+        else:
+            print(f"[OK] Found {file_name}")
     
     # Build executables
     success_count = 0
