@@ -2,11 +2,15 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
   release:
     types: [published]
+
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   test:
@@ -43,6 +47,9 @@ jobs:
     needs: test
     runs-on: ${{ matrix.os }}
     if: github.event_name == 'release'
+    permissions:
+      contents: read
+      actions: read
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -100,6 +107,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
+    permissions:
+      contents: read
+      id-token: write  # For trusted publishing to PyPI
     
     steps:
     - uses: actions/checkout@v4
