@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ExcelSearchPro ${{ github.ref }}
+        body: |
+          ## What's New in This Release
+          
+          ### 🚀 Features
+          - Fast Excel database searching
+          - Support for .xlsx, .xls, and .csv files
+          - Real-time search as you type
+          - Multiple search options (case sensitive, exact match, regex)
+          - Export search results functionality
+          - Unicode filename support
+          
+          ### 📦 Downloads
+          - **Windows**: Download `ExcelSearchPro-windows-latest.zip`
+          - **macOS**: Download `ExcelSearchPro-macos-latest.zip`
+          - **Linux**: Download `ExcelSearchPro-ubuntu-latest.zip`
+          - **Python Package**: `pip install excelsearchpro`
+          
+          ### 🔧 Installation
+          1. Download the appropriate package for your OS
+          2. Extract the files
+          3. Run the executable or follow Python installation instructions
+          
+          ### 📋 Requirements
+          - Python 3.8+ (for source installation)
+          - Windows 10+, macOS 10.14+, or modern Linux distribution
+        draft: false
+        prerelease: false
+
+  build-and-upload:
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build executables (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        python build_exe.py
+        
+    - name: Build executables (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        pyinstaller --onefile --windowed --name=ExcelSearchPro-GUI main.py
+        pyinstaller --onefile --name=ExcelSearchPro-CLI excel_search_cli.py
+        pyinstaller --onefile --name=ExcelSearchPro main.py
+    
+    - name: Create release package (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir ExcelSearchPro-Release
+        copy release\*.exe ExcelSearchPro-Release\
+        copy LICENSE ExcelSearchPro-Release\
+        copy README.md ExcelSearchPro-Release\
+        copy install.bat ExcelSearchPro-Release\
+        Compress-Archive -Path ExcelSearchPro-Release\* -DestinationPath ExcelSearchPro-${{ matrix.os }}.zip
+    
+    - name: Create release package (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        mkdir ExcelSearchPro-Release
+        cp dist/* ExcelSearchPro-Release/ 2>/dev/null || :
+        cp LICENSE ExcelSearchPro-Release/
+        cp README.md ExcelSearchPro-Release/
+        zip -r ExcelSearchPro-${{ matrix.os }}.zip ExcelSearchPro-Release/
+    
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./ExcelSearchPro-${{ matrix.os }}.zip
+        asset_name: ExcelSearchPro-${{ matrix.os }}.zip
+        asset_content_type: application/zip

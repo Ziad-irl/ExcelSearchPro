@@ -1,0 +1,17 @@
+include README.md
+include LICENSE
+include requirements.txt
+include run.bat
+include run.ps1
+recursive-include .github *
+recursive-include .vscode *
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude *.orig
+global-exclude *.rej
+global-exclude *~
+global-exclude .git*
+global-exclude .DS_Store
+global-exclude *.xlsx
+global-exclude *.xls
+global-exclude *.csv
