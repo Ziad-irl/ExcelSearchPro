@@ -14,190 +14,175 @@ def check_pyinstaller():
     """Check if PyInstaller is installed"""
     try:
         import PyInstaller
-        print("✅ PyInstaller is available")
+        print("[OK] PyInstaller is available")
         return True
     except ImportError:
-        print("❌ PyInstaller not found")
-        print("📦 Installing PyInstaller...")
+        print("[ERROR] PyInstaller not found")
+        print("Installing PyInstaller...")
         try:
             subprocess.check_call([sys.executable, "-m", "pip", "install", "pyinstaller"])
-            print("✅ PyInstaller installed successfully")
+            print("[OK] PyInstaller installed successfully")
             return True
         except subprocess.CalledProcessError:
-            print("❌ Failed to install PyInstaller")
+            print("[ERROR] Failed to install PyInstaller")
             return False
 
-def create_icon():
-    """Create a simple icon file (optional)"""
-    # We'll skip this for now, PyInstaller can use a default icon
-    pass
-
 def build_gui_exe():
-    """Build GUI executable"""
-    print("\n🏗️  Building GUI Executable...")
+    """Build the GUI executable"""
+    print("\n[BUILD] Building GUI Executable...")
     
     cmd = [
         "pyinstaller",
-        "--onefile",                    # Single executable file
-        "--windowed",                   # No console window for GUI
-        "--name", "ExcelSearchPro-GUI", # Output name
-        "--add-data", "requirements.txt;.",  # Include requirements
-        "--hidden-import", "pandas",
-        "--hidden-import", "openpyxl", 
-        "--hidden-import", "xlrd",
-        "--hidden-import", "tkinter",
+        "--onefile",
+        "--windowed",
+        "--name=ExcelSearchPro-GUI",
+        "--icon=icon.ico",
+        "--add-data=icon.ico;.",
+        "--distpath=dist",
+        "--workpath=build",
+        "--specpath=.",
         "excel_search_gui.py"
     ]
     
     try:
-        subprocess.check_call(cmd)
-        print("✅ GUI executable created successfully")
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        print("[OK] GUI executable created successfully")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to build GUI executable: {e}")
+        print(f"[ERROR] Failed to build GUI executable: {e}")
         return False
 
 def build_cli_exe():
-    """Build CLI executable"""
-    print("\n🏗️  Building CLI Executable...")
+    """Build the CLI executable"""
+    print("\n[BUILD] Building CLI Executable...")
     
     cmd = [
-        "pyinstaller", 
-        "--onefile",                    # Single executable file
-        "--console",                    # Keep console window for CLI
-        "--name", "ExcelSearchPro-CLI", # Output name
-        "--add-data", "requirements.txt;.",  # Include requirements
-        "--hidden-import", "pandas",
-        "--hidden-import", "openpyxl",
-        "--hidden-import", "xlrd", 
+        "pyinstaller",
+        "--onefile",
+        "--name=ExcelSearchPro-CLI",
+        "--icon=icon.ico",
+        "--distpath=dist",
+        "--workpath=build",
+        "--specpath=.",
         "excel_search_cli.py"
     ]
     
     try:
-        subprocess.check_call(cmd)
-        print("✅ CLI executable created successfully")
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        print("[OK] CLI executable created successfully")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to build CLI executable: {e}")
+        print(f"[ERROR] Failed to build CLI executable: {e}")
         return False
 
 def build_main_exe():
-    """Build main launcher executable"""
-    print("\n🏗️  Building Main Launcher Executable...")
+    """Build the main launcher executable"""
+    print("\n[BUILD] Building Main Launcher Executable...")
     
     cmd = [
         "pyinstaller",
-        "--onefile",                    # Single executable file
-        "--console",                    # Keep console for menu
-        "--name", "ExcelSearchPro",     # Output name
-        "--add-data", "requirements.txt;.",  # Include requirements  
-        "--hidden-import", "pandas",
-        "--hidden-import", "openpyxl",
-        "--hidden-import", "xlrd",
-        "--hidden-import", "tkinter",
+        "--onefile",
+        "--name=ExcelSearchPro",
+        "--icon=icon.ico",
+        "--add-data=icon.ico;.",
+        "--distpath=dist",
+        "--workpath=build",
+        "--specpath=.",
         "main.py"
     ]
     
     try:
-        subprocess.check_call(cmd)
-        print("✅ Main launcher executable created successfully")
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        print("[OK] Main launcher executable created successfully")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to build main executable: {e}")
+        print(f"[ERROR] Failed to build main executable: {e}")
         return False
 
 def create_installer_script():
-    """Create a simple installer batch script"""
-    installer_content = """@echo off
-echo 🔍 ExcelSearchPro Installation
-echo ==============================
-echo.
+    """Create Windows installer batch script"""
+    installer_content = '''@echo off
+title ExcelSearchPro Installer
+echo ================================================
+echo          EXCELSEARCHPRO INSTALLER
+echo ================================================
 
-echo 📁 Creating installation directory...
+echo [INFO] Creating installation directory...
 set "INSTALL_DIR=%USERPROFILE%\\ExcelSearchPro"
 if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 
-echo 📦 Copying files...
+echo [INFO] Copying files...
 copy "ExcelSearchPro.exe" "%INSTALL_DIR%\\" >nul
-copy "ExcelSearchPro-GUI.exe" "%INSTALL_DIR%\\" >nul  
+copy "ExcelSearchPro-GUI.exe" "%INSTALL_DIR%\\" >nul
 copy "ExcelSearchPro-CLI.exe" "%INSTALL_DIR%\\" >nul
 copy "README.md" "%INSTALL_DIR%\\" >nul
+copy "LICENSE" "%INSTALL_DIR%\\" >nul
 
-echo 🔗 Creating desktop shortcut...
+echo [INFO] Creating desktop shortcut...
+set "DESKTOP=%USERPROFILE%\\Desktop"
 echo Set oWS = WScript.CreateObject("WScript.Shell") > CreateShortcut.vbs
-echo sLinkFile = "%USERPROFILE%\\Desktop\\ExcelSearchPro.lnk" >> CreateShortcut.vbs
+echo sLinkFile = "%DESKTOP%\\ExcelSearchPro.lnk" >> CreateShortcut.vbs
 echo Set oLink = oWS.CreateShortcut(sLinkFile) >> CreateShortcut.vbs
 echo oLink.TargetPath = "%INSTALL_DIR%\\ExcelSearchPro.exe" >> CreateShortcut.vbs
 echo oLink.WorkingDirectory = "%INSTALL_DIR%" >> CreateShortcut.vbs
 echo oLink.Description = "ExcelSearchPro - Fast Excel Database Search" >> CreateShortcut.vbs
 echo oLink.Save >> CreateShortcut.vbs
-cscript CreateShortcut.vbs >nul 2>&1
-del CreateShortcut.vbs >nul 2>&1
+cscript CreateShortcut.vbs >nul
+del CreateShortcut.vbs
 
 echo.
-echo ✅ Installation complete!
-echo 📍 Installed to: %INSTALL_DIR%
-echo 🖥️  Desktop shortcut created
-echo 🚀 Double-click desktop shortcut to run
+echo [OK] Installation complete!
+echo.
+echo [INFO] Desktop shortcut created
+echo [INFO] Double-click desktop shortcut to run
 echo.
 pause
-"""
+'''
     
-    with open("install.bat", "w") as f:
+    with open("install.bat", "w", encoding="utf-8") as f:
         f.write(installer_content)
     
-    print("✅ Installer script created: install.bat")
+    print("[OK] Installer script created: install.bat")
 
 def create_release_package():
-    """Create a release package with all executables"""
-    print("\n📦 Creating Release Package...")
-    
-    # Create release directory
+    """Create release directory with all files"""
     release_dir = Path("release")
-    if release_dir.exists():
-        shutil.rmtree(release_dir)
-    release_dir.mkdir()
+    release_dir.mkdir(exist_ok=True)
     
     # Copy executables
     dist_dir = Path("dist")
     if dist_dir.exists():
         for exe_file in dist_dir.glob("*.exe"):
             shutil.copy2(exe_file, release_dir)
-            print(f"✅ Copied {exe_file.name}")
+            print(f"[OK] Copied {exe_file.name}")
     
     # Copy documentation
-    files_to_copy = ["README.md", "LICENSE", "requirements.txt"]
+    files_to_copy = ["README.md", "LICENSE", "install.bat"]
     for file_name in files_to_copy:
         if Path(file_name).exists():
             shutil.copy2(file_name, release_dir)
-            print(f"✅ Copied {file_name}")
+            print(f"[OK] Copied {file_name}")
     
-    # Copy installer
-    if Path("install.bat").exists():
-        shutil.copy2("install.bat", release_dir)
-        print("✅ Copied install.bat")
-    
-    print(f"\n🎉 Release package created in: {release_dir.absolute()}")
     return release_dir
 
 def clean_build_files():
     """Clean up build artifacts"""
-    print("\n🧹 Cleaning up build files...")
+    print("\n[CLEANUP] Removing build artifacts...")
     
-    dirs_to_remove = ["build", "__pycache__"]
-    for dir_name in dirs_to_remove:
+    # Remove build directories
+    for dir_name in ["build", "__pycache__"]:
         if Path(dir_name).exists():
             shutil.rmtree(dir_name)
-            print(f"✅ Removed {dir_name}")
+            print(f"[OK] Removed {dir_name}")
     
     # Remove .spec files
     for spec_file in Path(".").glob("*.spec"):
         spec_file.unlink()
-        print(f"✅ Removed {spec_file}")
+        print(f"[OK] Removed {spec_file}")
 
 def main():
     """Main build function"""
-    print("🏗️  EXCELSEARCHPRO EXECUTABLE BUILDER")
+    print("EXCELSEARCHPRO EXECUTABLE BUILDER")
     print("=" * 50)
     
     # Check PyInstaller
@@ -217,7 +202,7 @@ def main():
         success_count += 1
     
     if success_count == 0:
-        print("\n❌ No executables were created successfully")
+        print("\n[ERROR] No executables were created successfully")
         return False
     
     # Create installer and package
@@ -225,18 +210,18 @@ def main():
     release_dir = create_release_package()
     
     # Show results
-    print("\n🎉 BUILD COMPLETE!")
+    print("\n[SUCCESS] BUILD COMPLETE!")
     print("=" * 50)
-    print(f"✅ Created {success_count}/3 executables")
-    print(f"📁 Release package: {release_dir.absolute()}")
-    print("\n📋 Files created:")
+    print(f"[OK] Created {success_count}/3 executables")
+    print(f"[INFO] Release package: {release_dir.absolute()}")
+    print("\n[INFO] Files created:")
     
     if Path("dist").exists():
         for exe_file in Path("dist").glob("*.exe"):
             file_size = exe_file.stat().st_size / (1024 * 1024)  # MB
-            print(f"   • {exe_file.name} ({file_size:.1f} MB)")
+            print(f"   - {exe_file.name} ({file_size:.1f} MB)")
     
-    print(f"\n🚀 Distribution options:")
+    print(f"\n[INFO] Distribution options:")
     print(f"   1. Share the entire 'release' folder")
     print(f"   2. Users run 'install.bat' for easy installation")
     print(f"   3. Or just share individual .exe files")
@@ -250,14 +235,13 @@ if __name__ == "__main__":
     try:
         success = main()
         if not success:
-            input("\n❌ Build failed. Press Enter to exit...")
+            print("\n[ERROR] Build failed.")
             sys.exit(1)
         else:
-            input(f"\n✅ Build successful! Press Enter to exit...")
+            print(f"\n[SUCCESS] Build successful!")
     except KeyboardInterrupt:
-        print("\n\n⚠️  Build cancelled by user")
+        print("\n\n[WARNING] Build cancelled by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Unexpected error during build: {e}")
-        input("Press Enter to exit...")
+        print(f"\n[ERROR] Unexpected error during build: {e}")
         sys.exit(1)
