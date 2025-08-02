@@ -192,6 +192,14 @@ TODO.txt
 !CHANGELOG.md
 !docs/
 
+# Keep marketing and media files
+!MARKETING_STRATEGY.md
+!BENCHMARKS.md
+!SOCIAL_MEDIA_CONTENT.md
+!PRESS_RELEASE.md
+!screenshots/
+!screenshots/**
+
 # Backup and temporary files
 *.bak
 *.backup

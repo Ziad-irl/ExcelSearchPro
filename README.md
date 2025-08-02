@@ -9,7 +9,21 @@
 
 A powerful, lightning-fast search tool for large Excel databases. Search through millions of rows in milliseconds with an intuitive GUI or blazing-fast command-line interface.
 
-## 🚀 Quick Start
+## � Screenshots
+
+### 🖥️ GUI Interface
+![ExcelSearchPro GUI](https://github.com/Ziad-irl/ExcelSearchPro/raw/master/screenshots/gui-main.png)
+*Beautiful, intuitive interface with real-time search results*
+
+### ⚡ Performance Demo
+![Speed Comparison](https://github.com/Ziad-irl/ExcelSearchPro/raw/master/screenshots/performance-demo.gif)
+*Search 1 million rows in under 200ms*
+
+### 🔍 Advanced Search Features
+![Advanced Search](https://github.com/Ziad-irl/ExcelSearchPro/raw/master/screenshots/search-options.png)
+*Regex support, case sensitivity, and export functionality*
+
+## �🚀 Quick Start
 
 ### Option 1: Install from PyPI (Coming Soon)
 ```bash
